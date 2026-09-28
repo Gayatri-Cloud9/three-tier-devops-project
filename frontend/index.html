@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense App</title>
+</head>
+
+<body>
+
+    <h1>Expense Application</h1>
+
+    <input type="number" id="amount" placeholder="Amount">
+    <input type="text" id="description" placeholder="Description">
+
+    <button onclick="addExpense()">Add Expense</button>
+
+    <h2>Expenses</h2>
+
+    <ul id="expenseList"></ul>
+
+    <script>
+        async function addExpense() {
+
+            const amount = document.getElementById("amount").value;
+            const description = document.getElementById("description").value;
+
+            const response = await fetch("http://localhost:3000/expenses", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    amount: Number(amount),
+                    description: description
+                })
+            });
+
+            const data = await response.json();
+
+            alert(data.message);
+
+            document.getElementById("amount").value = "";
+            document.getElementById("description").value = "";
+
+            loadExpenses();
+        }
+
+        async function loadExpenses() {
+
+            const response = await fetch("http://localhost:3000/expenses");
+
+            const expenses = await response.json();
+
+            const list = document.getElementById("expenseList");
+
+            list.innerHTML = "";
+
+            expenses.forEach(expense => {
+
+                const item = document.createElement("li");
+
+                item.textContent =
+                    "$" + expense.amount + " - " + expense.description;
+
+                list.appendChild(item);
+            });
+        }
+
+        loadExpenses();
+    </script>
+
+</body>
+</html>
